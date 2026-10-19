@@ -1,0 +1,15 @@
+{
+  "name": "bloom-platform",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test"
+  },
+  "devDependencies": {
+    "turbo": "^2.11.3",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@12.6.0"
+}

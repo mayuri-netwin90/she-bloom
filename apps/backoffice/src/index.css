@@ -1,0 +1,162 @@
+:root {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  font-family: var(--mantine-font-family);
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+}
+
+a {
+  color: var(--text-link);
+}
+
+/* Figma Typography Utilities */
+.typography-heading-display {
+  font-family: var(--font-family-heading);
+  font-size: 2rem; /* 32px */
+  line-height: 2.5rem; /* 40px */
+  font-weight: 400;
+  color: var(--text-heading);
+}
+
+.typography-heading-h1 {
+  font-family: var(--font-family-heading);
+  font-size: 1.75rem; /* 28px */
+  line-height: 2.25rem; /* 36px */
+  font-weight: 400;
+  color: var(--text-heading);
+}
+
+.typography-heading-h2 {
+  font-family: var(--font-family-heading);
+  font-size: 1.5rem; /* 24px */
+  line-height: 2rem; /* 32px */
+  font-weight: 400;
+  color: var(--text-heading);
+}
+
+.typography-heading-h3 {
+  font-family: var(--font-family-body);
+  font-size: 1.25rem; /* 20px */
+  line-height: 1.75rem; /* 28px */
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.typography-heading-h4 {
+  font-family: var(--font-family-body);
+  font-size: 1rem; /* 16px */
+  line-height: 1.5rem; /* 24px */
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.typography-body-regular {
+  font-family: var(--font-family-body);
+  font-size: 1rem; /* 16px */
+  line-height: 1.5rem; /* 24px */
+  font-weight: 400;
+}
+
+.typography-body-medium {
+  font-family: var(--font-family-body);
+  font-size: 1rem; /* 16px */
+  line-height: 1.5rem; /* 24px */
+  font-weight: 500;
+}
+
+.typography-body-small {
+  font-family: var(--font-family-body);
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.25rem; /* 20px */
+  font-weight: 400;
+}
+
+.typography-body-small-medium {
+  font-family: var(--font-family-body);
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.25rem; /* 20px */
+  font-weight: 500;
+}
+
+.typography-label-default {
+  font-family: var(--font-family-body);
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.25rem; /* 20px */
+  font-weight: 600;
+}
+
+.typography-label-small {
+  font-family: var(--font-family-body);
+  font-size: 0.75rem; /* 12px */
+  line-height: 1rem; /* 16px */
+  font-weight: 600;
+}
+
+.typography-caption-regular {
+  font-family: var(--font-family-body);
+  font-size: 0.75rem; /* 12px */
+  line-height: 1.125rem; /* 18px */
+  font-weight: 400;
+}
+
+.typography-caption-bold {
+  font-family: var(--font-family-body);
+  font-size: 0.75rem; /* 12px */
+  line-height: 1.125rem; /* 18px */
+  font-weight: 600;
+}
+
+.typography-overline {
+  font-family: var(--font-family-body);
+  font-size: 0.6875rem; /* 11px */
+  line-height: 1rem; /* 16px */
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.typography-kpi-value {
+  font-family: var(--font-family-body);
+  font-size: 1.5rem; /* 24px */
+  line-height: 1.5rem; /* 24px */
+  font-weight: 700;
+}
+
+.typography-footnote {
+  font-family: var(--font-family-footnote);
+  font-size: 0.6875rem; /* 11px */
+  line-height: 1rem; /* 16px */
+  font-weight: 400;
+}
+
+/* Tabler Icons Standards: outline, stroke 1.5, 16px in Button/Input, 20px in NavLink */
+.tabler-icon,
+svg.tabler-icon {
+  stroke-width: 1.5;
+}
+
+button .tabler-icon,
+.mantine-Button-root .tabler-icon,
+.mantine-TextInput-root .tabler-icon,
+.mantine-PasswordInput-root .tabler-icon,
+.mantine-Select-root .tabler-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.mantine-NavLink-root .tabler-icon {
+  width: 20px;
+  height: 20px;
+}
+
+
