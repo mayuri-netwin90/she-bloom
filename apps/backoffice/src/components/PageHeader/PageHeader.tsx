@@ -11,6 +11,8 @@ export interface PageHeaderProps {
   subtitle?: ReactNode
   breadcrumbs?: BreadcrumbItem[]
   action?: ReactNode
+  mb?: string | number
+  style?: React.CSSProperties
 }
 
 /**
@@ -22,9 +24,11 @@ export function PageHeader({
   subtitle,
   breadcrumbs,
   action,
+  mb = 'xl',
+  style,
 }: PageHeaderProps) {
   return (
-    <Stack gap="xs" mb="xl">
+    <Stack gap="xs" mb={mb} style={style}>
       {breadcrumbs && breadcrumbs.length > 0 && (
         <Breadcrumbs separator="/" separatorMargin="xs">
           {breadcrumbs.map((item, index) => {

@@ -11,6 +11,7 @@ import { EnableTwoFactorForm } from './pages/Auth/EnableTwoFactor'
 import { SetPasswordForm } from './pages/Auth/SetPassword'
 import { RecoverPassword } from './pages/Auth/RecoverPassword'
 import { AdminDashboard } from './pages/Dashboard'
+import { AppUsersList } from './pages/AppUsers'
 import './App.css'
 
 function ConnectedLoginForm() {
@@ -49,14 +50,32 @@ function ConnectedLoginForm() {
     }
   }
 
-  // Allow previewing different screens via URL query: ?screen=dashboard, ?screen=2fa, etc.
+  // Allow previewing different screens via URL query: ?screen=dashboard, ?screen=users, ?screen=2fa, etc.
   const params = new URLSearchParams(window.location.search)
   const screen = params.get('screen')
+
+  if (screen === 'users' || screen === 'app-users' || screen === 'app_users') {
+    return (
+      <AppLayout
+        currentRole="admin"
+        activePath="/users/app"
+        user={{
+          name: 'Giulia Ferri',
+          email: 'giulia.ferri@shebloom.it',
+          role: 'admin',
+        }}
+        onLogout={() => { window.location.search = '' }}
+      >
+        <AppUsersList />
+      </AppLayout>
+    )
+  }
 
   if (screen === 'dashboard' || screen === 'admin' || screen === 'admin-dashboard') {
     return (
       <AppLayout
         currentRole="admin"
+        activePath="/dashboard"
         user={{
           name: 'Giulia Ferri',
           email: 'giulia.ferri@shebloom.it',
@@ -156,6 +175,7 @@ function ConnectedLoginForm() {
 
 function MainAppShell() {
   const { user, logout, switchRole } = useAuth()
+  const [currentPath, setCurrentPath] = useState('/dashboard')
 
   return (
     <ProtectedRoute fallback={<ConnectedLoginForm />}>
@@ -164,9 +184,15 @@ function MainAppShell() {
           currentRole={user.role}
           onRoleChange={switchRole}
           onLogout={logout}
+          activePath={currentPath}
+          onNavigate={(path) => setCurrentPath(path)}
           user={user}
         >
-          <AdminDashboard />
+          {currentPath === '/users/app' ? (
+            <AppUsersList />
+          ) : (
+            <AdminDashboard />
+          )}
         </AppLayout>
       )}
     </ProtectedRoute>

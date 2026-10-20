@@ -5,6 +5,8 @@ export interface AppAvatarProps {
   src?: string
   size?: 'xs' | 'sm' | 'md' | 'lg' | number
   alt?: string
+  bgColor?: string
+  textColor?: string
 }
 
 const avatarSizes = {
@@ -22,6 +24,8 @@ export const AppAvatar: React.FC<AppAvatarProps> = ({
   src,
   size = 'md',
   alt = 'Avatar',
+  bgColor = 'var(--brand-accent)',
+  textColor = 'var(--bg-sidebar)',
 }) => {
   const pixelSize = typeof size === 'number' ? size : avatarSizes[size]
 
@@ -46,8 +50,8 @@ export const AppAvatar: React.FC<AppAvatarProps> = ({
         width: pixelSize,
         height: pixelSize,
         borderRadius: '50%',
-        backgroundColor: 'var(--brand-accent)',
-        color: 'var(--bg-sidebar)',
+        backgroundColor: bgColor,
+        color: textColor,
         fontFamily: 'var(--font-family-body)',
         fontWeight: 700,
         fontSize: `${pixelSize * 0.4}px`,

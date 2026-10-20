@@ -36,6 +36,8 @@ export interface AppLayoutProps {
   currentRole?: UserRole
   onRoleChange?: (role: UserRole) => void
   onLogout?: () => void
+  activePath?: string
+  onNavigate?: (path: string) => void
   user?: {
     name: string
     email: string
@@ -56,6 +58,8 @@ export function AppLayout({
   currentRole: initialRole,
   onRoleChange,
   onLogout,
+  activePath: controlledPath,
+  onNavigate: controlledNavigate,
   user = {
     name: 'Giulia Bianchi',
     email: 'giulia@bloom.it',
@@ -66,7 +70,8 @@ export function AppLayout({
   const [opened, { toggle, close }] = useDisclosure(false)
   const [sessionExpired, setSessionExpired] = useState(false)
   const [activeRole, setActiveRole] = useState<UserRole>(initialRole ?? 'admin')
-  const [activePath, setActivePath] = useState<string>('/dashboard')
+  const [internalActivePath, setInternalActivePath] = useState<string>('/dashboard')
+  const activePath = controlledPath ?? internalActivePath
   const [language, setLanguage] = useState<'IT' | 'EN'>('IT')
 
   // Inactivity timeout: 30 minutes (RF-BO-ACC-05)
@@ -124,7 +129,11 @@ export function AppLayout({
   }
 
   const handleNavigate = (path: string) => {
-    setActivePath(path)
+    if (controlledNavigate) {
+      controlledNavigate(path)
+    } else {
+      setInternalActivePath(path)
+    }
     if (isMobile) close()
   }
 

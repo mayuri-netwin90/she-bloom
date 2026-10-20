@@ -16,7 +16,7 @@ import {
 import { PageHeader } from '../../components/PageHeader'
 import { StatCard } from '../../components/StatCard'
 import { AppAvatar } from '../../components/AppAvatar'
-import { StatusBadge } from '../../components/StatusBadge'
+import { StatusBadge, type StandardStatus } from '../../components/StatusBadge'
 import { CounterBadge } from '../../components/CounterBadge'
 import { AppIcon, type AppIconName } from '../../components/AppIcon'
 
@@ -40,7 +40,7 @@ export interface BookingRow {
   }
   mentor: string
   service: string
-  status: 'active' | 'warning' | 'pending' | 'success' | 'danger'
+  status: StandardStatus
   statusLabel?: string
 }
 
@@ -487,12 +487,38 @@ export function AdminDashboard({
                     overflow: 'hidden',
                   }}
                 >
-                  <Table.Thead style={{ backgroundColor: 'var(--bg-canvas)' }}>
+                  <Table.Thead
+                    style={{
+                      backgroundColor: 'var(--bg-canvas)',
+                      fontWeight: 500,
+                      textTransform: 'none',
+                    }}
+                  >
                     <Table.Tr>
-                      <Table.Th style={{ width: 70, color: 'var(--text-secondary)' }}>Time</Table.Th>
-                      <Table.Th style={{ minWidth: 160, color: 'var(--text-secondary)' }}>User</Table.Th>
-                      <Table.Th style={{ minWidth: 130, color: 'var(--text-secondary)' }}>Mentor</Table.Th>
-                      <Table.Th style={{ minWidth: 110, color: 'var(--text-secondary)' }}>Service</Table.Th>
+                      <Table.Th style={{ width: 85, color: 'var(--text-secondary)' }}>
+                        <Group gap={4} wrap="nowrap" align="center">
+                          <span>Time</span>
+                          <AppIcon name="chevronDown" size={14} stroke={1.5} color="var(--text-secondary)" />
+                        </Group>
+                      </Table.Th>
+                      <Table.Th style={{ minWidth: 160, color: 'var(--text-secondary)' }}>
+                        <Group gap={4} wrap="nowrap" align="center">
+                          <span>User</span>
+                          <AppIcon name="chevronDown" size={14} stroke={1.5} color="var(--text-secondary)" />
+                        </Group>
+                      </Table.Th>
+                      <Table.Th style={{ minWidth: 130, color: 'var(--text-secondary)' }}>
+                        <Group gap={4} wrap="nowrap" align="center">
+                          <span>Mentor</span>
+                          <AppIcon name="chevronDown" size={14} stroke={1.5} color="var(--text-secondary)" />
+                        </Group>
+                      </Table.Th>
+                      <Table.Th style={{ minWidth: 110, color: 'var(--text-secondary)' }}>
+                        <Group gap={4} wrap="nowrap" align="center">
+                          <span>Service</span>
+                          <AppIcon name="chevronDown" size={14} stroke={1.5} color="var(--text-secondary)" />
+                        </Group>
+                      </Table.Th>
                       <Table.Th style={{ minWidth: 140, color: 'var(--text-secondary)' }}>Status</Table.Th>
                     </Table.Tr>
                   </Table.Thead>
@@ -522,7 +548,12 @@ export function AdminDashboard({
                           {/* User with avatar */}
                           <Table.Td>
                             <Group gap="sm" wrap="nowrap">
-                              <AppAvatar initials={initials} size={32} />
+                              <AppAvatar
+                                initials={initials}
+                                size={32}
+                                bgColor="var(--brand-secondary)"
+                                textColor="var(--brand-violet)"
+                              />
                               <div style={{ minWidth: 0 }}>
                                 <Text
                                   size="sm"

@@ -830,9 +830,9 @@ export const theme = createTheme({
           fontFamily: 'var(--font-family-body)',
           fontSize: '0.75rem',
           lineHeight: '1rem',
-          fontWeight: 600,
-          textTransform: 'uppercase',
-          letterSpacing: '0.04em',
+          fontWeight: 700,
+          textTransform: 'none',
+          letterSpacing: '0.02em',
           color: 'var(--text-secondary)',
         },
         td: {
