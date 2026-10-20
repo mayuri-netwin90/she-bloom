@@ -887,7 +887,6 @@ export const theme = createTheme({
       defaultProps: {
         radius: 'md',
         size: 'sm',
-        color: 'sidebar-violet',
       },
       styles: {
         control: {
@@ -895,16 +894,22 @@ export const theme = createTheme({
           fontSize: '0.875rem',
           fontWeight: 600,
           borderColor: 'var(--border-default)',
-          color: 'var(--text-primary)',
           transition: 'all 150ms ease',
-          '&:hover': {
-            borderColor: 'var(--brand-primary)',
+          '&:not([data-active])': {
+            color: 'var(--text-primary) !important',
+          },
+          '&:hover:not([data-active])': {
+            borderColor: 'var(--border-strong) !important',
             backgroundColor: 'var(--bg-subtle)',
           },
+          '&:focus, &:focus-visible': {
+            outline: 'none !important',
+            boxShadow: 'none !important',
+          },
           '&[data-active]': {
-            backgroundColor: 'var(--bg-sidebar)',
-            color: 'var(--text-on-sidebar)',
-            borderColor: 'var(--bg-sidebar)',
+            backgroundColor: 'var(--bg-sidebar) !important',
+            color: 'var(--text-on-sidebar) !important',
+            borderColor: 'var(--bg-sidebar) !important',
           },
         },
       },

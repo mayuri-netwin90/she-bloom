@@ -115,6 +115,26 @@ const statusStyleMap: Record<
     color: 'var(--status-neutral-fg)',
     dot: 'var(--status-neutral-fg)',
   },
+  to_verify: {
+    bg: 'var(--status-warning-bg)',
+    color: 'var(--status-warning-fg)',
+    dot: 'var(--status-warning-fg)',
+  },
+  'to verify': {
+    bg: 'var(--status-warning-bg)',
+    color: 'var(--status-warning-fg)',
+    dot: 'var(--status-warning-fg)',
+  },
+  anonymized: {
+    bg: 'var(--status-neutral-bg)',
+    color: 'var(--status-neutral-fg)',
+    dot: 'var(--status-neutral-fg)',
+  },
+  anonymised: {
+    bg: 'var(--status-neutral-bg)',
+    color: 'var(--status-neutral-fg)',
+    dot: 'var(--status-neutral-fg)',
+  },
 }
 
 /**
@@ -141,7 +161,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     dot: 'var(--status-neutral-fg)',
   }
 
-  const displayLabel = status.toUpperCase()
+  const displayLabel = status.replace(/_/g, ' ').toUpperCase()
 
   return (
     <Badge

@@ -142,11 +142,14 @@ export function AppUsersList({
           <Button
             variant="outline"
             color="brand-pink"
+            fullWidth={isMobile}
+            w={{ base: '100%', sm: 'auto' }}
             leftSection={<AppIcon name="download" size={16} stroke={1.5} color="var(--brand-primary)" />}
             onClick={onExportCSV}
             styles={{
               root: {
-                borderColor: 'var(--brand-secondary)',
+                width: isMobile ? '100%' : 'auto',
+                borderColor: 'var(--brand-primary)',
                 color: 'var(--brand-primary)',
                 backgroundColor: 'var(--bg-surface)',
                 fontWeight: 600,
@@ -154,6 +157,7 @@ export function AppUsersList({
                 height: 38,
                 padding: '0 16px',
                 borderRadius: 'var(--radius-md)',
+                justifyContent: 'center',
                 '&:hover': {
                   backgroundColor: 'var(--bg-brand-soft)',
                 },
@@ -189,19 +193,13 @@ export function AppUsersList({
               }}
             />
 
-            {/* Figma Filter Pills Container */}
-            <Box
+            {/* Figma Filter Pills (Standalone Pills with Gap) */}
+            <Group
+              gap="xs"
+              wrap="nowrap"
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                backgroundColor: 'var(--bg-muted)',
-                padding: '3px',
-                borderRadius: '9999px',
-                gap: '4px',
-                height: 38,
                 width: isMobile ? '100%' : 'auto',
                 overflowX: 'auto',
-                boxSizing: 'border-box',
               }}
             >
               {filterTabs.map((tab) => {
@@ -212,13 +210,16 @@ export function AppUsersList({
                     onClick={() => setActiveTab(tab.id)}
                     style={{
                       padding: '0 16px',
-                      height: 32,
+                      height: 36,
                       borderRadius: '9999px',
-                      backgroundColor: isActive ? 'var(--bg-sidebar)' : 'transparent',
-                      color: isActive ? 'var(--text-on-sidebar)' : 'var(--text-secondary)',
+                      backgroundColor: isActive ? 'var(--bg-sidebar)' : 'var(--bg-surface)',
+                      border: isActive
+                        ? '1px solid var(--bg-sidebar)'
+                        : '1px solid var(--border-default)',
+                      color: isActive ? 'var(--text-on-sidebar)' : 'var(--text-primary)',
                       fontSize: '0.8125rem',
                       fontFamily: 'var(--font-family-body)',
-                      fontWeight: isActive ? 600 : 500,
+                      fontWeight: 600,
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: 6,
@@ -226,16 +227,32 @@ export function AppUsersList({
                       flex: isMobile ? 1 : undefined,
                       justifyContent: 'center',
                       whiteSpace: 'nowrap',
+                      boxShadow: isActive ? 'none' : 'var(--shadow-small)',
+                      outline: 'none',
+                      WebkitTapHighlightColor: 'transparent',
+                    }}
+                    styles={{
+                      root: {
+                        outline: 'none !important',
+                        '&:focus': { outline: 'none !important', boxShadow: isActive ? 'none !important' : 'var(--shadow-small) !important' },
+                        '&:focus-visible': { outline: 'none !important', boxShadow: isActive ? 'none !important' : 'var(--shadow-small) !important' },
+                      },
                     }}
                   >
                     {isActive && (
-                      <AppIcon name="check" size={12} stroke={2.5} color="var(--text-on-sidebar)" />
+                      <AppIcon
+                        name="check"
+                        size={13}
+                        stroke={2.2}
+                        color="var(--text-on-sidebar)"
+                        style={{ display: 'inline-block', verticalAlign: 'middle' }}
+                      />
                     )}
                     <span>{tab.label}</span>
                   </UnstyledButton>
                 )
               })}
-            </Box>
+            </Group>
           </Group>
 
           {/* Right: More filters button (Desktop only) */}
@@ -246,7 +263,7 @@ export function AppUsersList({
               leftSection={<AppIcon name="filter" size={16} stroke={1.5} color="var(--brand-primary)" />}
               styles={{
                 root: {
-                  borderColor: 'var(--brand-secondary)',
+                  borderColor: 'var(--brand-primary)',
                   color: 'var(--brand-primary)',
                   backgroundColor: 'var(--bg-surface)',
                   fontWeight: 600,
@@ -294,7 +311,12 @@ export function AppUsersList({
               >
                 <Group justify="space-between" align="center" wrap="nowrap">
                   <Group gap="sm" align="center" wrap="nowrap">
-                    <AppAvatar initials={initials} size={36} />
+                    <AppAvatar
+                      initials={initials}
+                      size={36}
+                      bgColor="var(--brand-secondary)"
+                      textColor="var(--bg-sidebar)"
+                    />
                     <div>
                       <Text
                         size="sm"
@@ -466,7 +488,12 @@ export function AppUsersList({
                       {/* User Avatar + Name + Email */}
                       <Table.Td>
                         <Group gap="sm" wrap="nowrap">
-                          <AppAvatar initials={initials} size={36} />
+                          <AppAvatar
+                            initials={initials}
+                            size={36}
+                            bgColor="var(--brand-secondary)"
+                            textColor="var(--bg-sidebar)"
+                          />
                           <div>
                             <Text
                               size="sm"
@@ -493,10 +520,10 @@ export function AppUsersList({
                       <Table.Td>
                         <StatusBadge
                           status={user.subscription === 'club' ? 'violet' : 'neutral'}
-                          withDot={false}
+                          withDot={true}
                           size="sm"
                         >
-                          {user.subscription === 'club' ? '✦ CLUB' : 'FREE'}
+                          {user.subscription === 'club' ? 'CLUB' : 'FREE'}
                         </StatusBadge>
                       </Table.Td>
 
@@ -580,13 +607,33 @@ export function AppUsersList({
             value={currentPage}
             onChange={setCurrentPage}
             size="sm"
+            radius="md"
             color="sidebar-violet"
             styles={{
               control: {
+                borderRadius: '8px',
+                borderColor: 'var(--border-default)',
+                fontFamily: 'var(--font-family-body)',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                minWidth: '32px',
+                height: '32px',
+                '&:not([data-active])': {
+                  color: 'var(--text-primary) !important',
+                },
                 '&[data-active]': {
-                  backgroundColor: 'var(--bg-sidebar)',
-                  color: 'var(--text-on-sidebar)',
-                  borderColor: 'var(--bg-sidebar)',
+                  backgroundColor: 'var(--bg-sidebar) !important',
+                  color: 'var(--text-on-sidebar) !important',
+                  borderColor: 'var(--bg-sidebar) !important',
+                  fontWeight: 700,
+                },
+                '&:hover:not([data-active])': {
+                  backgroundColor: 'var(--bg-subtle)',
+                  borderColor: 'var(--border-strong) !important',
+                },
+                '&:focus, &:focus-visible': {
+                  outline: 'none !important',
+                  boxShadow: 'none !important',
                 },
               },
             }}
@@ -594,20 +641,7 @@ export function AppUsersList({
         </Group>
       </Box>
 
-      {/* 5. Requirements tag at footer */}
-      <Box mt="xl" pt="md">
-        <Text
-          size="11px"
-          fw={600}
-          style={{
-            color: 'var(--brand-primary)',
-            letterSpacing: '0.04em',
-            fontFamily: 'var(--font-family-body)',
-          }}
-        >
-          Requirements: RF-BO-USR-01
-        </Text>
-      </Box>
+
 
       {/* 6. User Details Drawer */}
       <DrawerWrapper
@@ -632,6 +666,8 @@ export function AppUsersList({
                   .slice(0, 2)
                   .toUpperCase()}
                 size={56}
+                bgColor="var(--brand-secondary)"
+                textColor="var(--bg-sidebar)"
               />
               <div>
                 <Text fw={700} size="lg" style={{ color: 'var(--text-heading)' }}>
@@ -643,10 +679,10 @@ export function AppUsersList({
                 <Group gap="xs" mt={6}>
                   <StatusBadge
                     status={selectedUser.subscription === 'club' ? 'violet' : 'neutral'}
-                    withDot={false}
+                    withDot={true}
                     size="sm"
                   >
-                    {selectedUser.subscription === 'club' ? '✦ CLUB' : 'FREE'}
+                    {selectedUser.subscription === 'club' ? 'CLUB' : 'FREE'}
                   </StatusBadge>
                   <StatusBadge status={selectedUser.status} size="sm" />
                 </Group>

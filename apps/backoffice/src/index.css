@@ -159,4 +159,37 @@ button .tabler-icon,
   height: 20px;
 }
 
+/* Mantine Pagination active button override for exact Figma violet.8 parity */
+.mantine-Pagination-control[data-active] {
+  background-color: var(--bg-sidebar) !important;
+  border-color: var(--bg-sidebar) !important;
+  color: var(--text-on-sidebar) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.mantine-Pagination-control:not([data-active]) {
+  color: var(--text-primary) !important;
+}
+
+.mantine-Pagination-control:focus,
+.mantine-Pagination-control:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.mantine-Pagination-control:hover:not([data-active]) {
+  border-color: var(--border-strong) !important;
+}
+
+/* Mobile full width export button */
+@media (max-width: 767.98px) {
+  .page-header-action-container,
+  .page-header-action-container > button,
+  .page-header-action-container .mantine-Button-root {
+    width: 100% !important;
+    display: flex !important;
+  }
+}
+
 

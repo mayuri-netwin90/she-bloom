@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { Anchor, Breadcrumbs, Group, Stack, Text, Title } from '@mantine/core'
+import { Anchor, Box, Breadcrumbs, Group, Stack, Text, Title } from '@mantine/core'
 
 export interface BreadcrumbItem {
   label: string
@@ -94,7 +94,14 @@ export function PageHeader({
             </Text>
           )}
         </div>
-        {action && <Group gap="sm" wrap="wrap">{action}</Group>}
+        {action && (
+          <Box
+            w={{ base: '100%', sm: 'auto' }}
+            className="page-header-action-container"
+          >
+            {action}
+          </Box>
+        )}
       </Group>
     </Stack>
   )
