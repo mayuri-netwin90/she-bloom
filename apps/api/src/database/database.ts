@@ -1,33 +1,41 @@
-import { randomBytes, scrypt as scryptCallback } from 'node:crypto';
-import { promisify } from 'node:util';
+import { readdir, readFile } from 'node:fs/promises';
 import { Pool } from 'pg';
+import { hashPassword } from '../common/password.js';
 
-const scrypt = promisify(scryptCallback);
-export const database = new Pool({ connectionString: process.env.DATABASE_URL ?? 'postgres://bloom:bloom@localhost:5432/bloom' });
+export const database = new Pool({ connectionString: process.env.DATABASE_URL });
+
+const migrationsDir = new URL('../../migrations/', import.meta.url);
+
+// ponytail: every migration is idempotent and re-run on boot; add a migrations table when one stops being idempotent.
+async function runMigrations() {
+  for (const file of (await readdir(migrationsDir)).filter((f) => f.endsWith('.sql')).sort()) {
+    await database.query(await readFile(new URL(file, migrationsDir), 'utf8'));
+  }
+}
+
+async function seedSuperAdmin() {
+  const { rows } = await database.query('SELECT 1 FROM bo_users WHERE is_super_admin');
+  if (rows.length) return;
+  const isProduction = process.env.NODE_ENV === 'production';
+  const email = process.env.SUPERADMIN_EMAIL ?? (isProduction ? undefined : 'superadmin@bloom.local');
+  const password = process.env.SUPERADMIN_PASSWORD ?? (isProduction ? undefined : 'ChangeMe123!');
+  if (!email || !password) {
+    console.warn('No superadmin exists and SUPERADMIN_EMAIL / SUPERADMIN_PASSWORD are not set: skipping seed.');
+    return;
+  }
+  // Existing account with the same email is promoted instead of duplicated.
+  // A superadmin is an Admin only: Mentor is exclusive (RF-BO-ACC-07), so it is cleared on promotion.
+  await database.query(
+    `INSERT INTO bo_users (email, full_name, password_hash, is_admin, is_super_admin, status)
+     VALUES ($1, $2, $3, true, true, 'active')
+     ON CONFLICT (lower(email)) DO UPDATE SET is_admin = true, is_mentor = false, is_super_admin = true,
+       status = 'active', password_hash = EXCLUDED.password_hash, updated_at = now()`,
+    [email.trim().toLowerCase(), process.env.SUPERADMIN_NAME ?? 'Super Admin', await hashPassword(password)],
+  );
+  console.log(`Superadmin seeded: ${email}`);
+}
 
 export async function initializeDatabase() {
-  await database.query('CREATE EXTENSION IF NOT EXISTS pgcrypto');
-  await database.query(`CREATE TABLE IF NOT EXISTS backoffice_users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(), email TEXT NOT NULL UNIQUE, name TEXT NOT NULL,
-    password_hash TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'ADMIN' CHECK (role IN ('ADMIN', 'OPERATOR', 'VIEWER')),
-    is_active BOOLEAN NOT NULL DEFAULT true, last_login_at TIMESTAMPTZ,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now())`);
-  await database.query(`CREATE TABLE IF NOT EXISTS mobile_users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(), email TEXT NOT NULL UNIQUE, name TEXT NOT NULL,
-    password_hash TEXT NOT NULL, is_active BOOLEAN NOT NULL DEFAULT true, last_login_at TIMESTAMPTZ,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now())`);
-  if (process.env.NODE_ENV !== 'production') {
-    const { rows } = await database.query<{ count: string }>('SELECT count(*) FROM backoffice_users');
-    if (Number(rows[0].count) === 0) {
-      const salt = randomBytes(16).toString('hex');
-      const key = await scrypt(process.env.DEV_ADMIN_PASSWORD ?? 'ChangeMe123!', salt, 64) as Buffer;
-      await database.query('INSERT INTO backoffice_users (email, name, password_hash, role) VALUES ($1, $2, $3, $4)', [process.env.DEV_ADMIN_EMAIL ?? 'admin@bloom.local', 'Bloom Administrator', `${salt}:${key.toString('hex')}`, 'ADMIN']);
-    }
-    const { rows: mobileRows } = await database.query<{ count: string }>('SELECT count(*) FROM mobile_users');
-    if (Number(mobileRows[0].count) === 0) {
-      const salt = randomBytes(16).toString('hex');
-      const key = await scrypt(process.env.DEV_MOBILE_PASSWORD ?? 'ChangeMe123!', salt, 64) as Buffer;
-      await database.query('INSERT INTO mobile_users (email, name, password_hash) VALUES ($1, $2, $3)', [process.env.DEV_MOBILE_EMAIL ?? 'member@bloom.local', 'Bloom Member', `${salt}:${key.toString('hex')}`]);
-    }
-  }
+  await runMigrations();
+  await seedSuperAdmin();
 }

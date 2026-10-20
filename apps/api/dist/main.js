@@ -1,3 +1,4 @@
+import './env.js'; // must stay first: loads .env before any module reads process.env
 import express from 'express';
 import swaggerUi from 'swagger-ui-express';
 import { initializeDatabase } from './database/database.js';
@@ -6,7 +7,7 @@ import { backofficeAuthRouter } from './backoffice-api/auth/auth.routes.js';
 import { backofficeUsersRouter } from './backoffice-api/users/users.routes.js';
 import { mobileAuthRouter } from './mobile-api/auth/auth.routes.js';
 import { mobileUsersRouter } from './mobile-api/users/users.routes.js';
-const app = express();
+export const app = express();
 const port = Number(process.env.PORT ?? 3000);
 app.use(express.json());
 app.use((req, res, next) => {
@@ -25,6 +26,14 @@ app.use('/backoffice/auth', backofficeAuthRouter);
 app.use('/backoffice/users', backofficeUsersRouter);
 app.use('/mobile/auth', mobileAuthRouter);
 app.use('/mobile/users', mobileUsersRouter);
+// Express 5 forwards async throws here; never leak internals to the client.
+app.use((error, _req, res, _next) => {
+    if (error?.type === 'entity.parse.failed')
+        return res.status(400).json({ code: 'VALIDATION_ERROR', message: 'Request body must be valid JSON.' });
+    console.error(error);
+    res.status(500).json({ code: 'INTERNAL_ERROR', message: 'Something went wrong. Please try again.' });
+});
 await initializeDatabase();
-app.listen(port, () => console.log(`Bloom API listening on http://localhost:${port}`));
+if (process.env.NODE_ENV !== 'test')
+    app.listen(port, () => console.log(`Bloom API listening on http://localhost:${port}`));
 //# sourceMappingURL=main.js.map

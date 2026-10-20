@@ -20,6 +20,13 @@ export interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
+/** API returns roles[] (ADMIN/MODERATOR/MENTOR); the UI shows one role, Admin taking precedence. */
+export function primaryRole(roles: string[] = []): UserRole {
+  if (roles.includes('ADMIN')) return 'admin'
+  if (roles.includes('MENTOR')) return 'mentor'
+  return 'moderator'
+}
+
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -42,12 +49,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return res.json()
       })
       .then((data) => {
-        const normalizedRole = (data.role?.toLowerCase() ?? 'admin') as UserRole
         setUser({
           id: data.id,
           name: data.name,
           email: data.email,
-          role: normalizedRole,
+          role: primaryRole(data.roles),
         })
       })
       .catch(() => {

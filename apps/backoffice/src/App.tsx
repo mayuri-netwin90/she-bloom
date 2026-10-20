@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Text } from '@mantine/core'
 import { AppLayout } from './layouts/AppLayout'
 import { QueryProvider } from './providers/QueryProvider'
-import { AuthProvider, useAuth } from './providers/AuthProvider'
+import { AuthProvider, primaryRole, useAuth } from './providers/AuthProvider'
 import { ProtectedRoute } from './components/Guards/ProtectedRoute'
 import { ActionModal } from './components/ActionModal'
 import { LoginForm } from './pages/Auth/Login'
@@ -15,15 +15,15 @@ import './App.css'
 
 function ConnectedLoginForm() {
   const { login } = useAuth()
-  const [email, setEmail] = useState('giulia.ferri@shebloom.it')
-  const [password, setPassword] = useState('password123')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(true)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError(false)
+    setError('')
     setLoading(true)
 
     try {
@@ -40,10 +40,10 @@ function ConnectedLoginForm() {
         id: data.user.id,
         name: data.user.name,
         email: data.user.email,
-        role: data.user.role?.toLowerCase() ?? 'admin',
+        role: primaryRole(data.user.roles),
       })
-    } catch {
-      setError(true)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to sign you in.')
     } finally {
       setLoading(false)
     }
@@ -101,7 +101,7 @@ function ConnectedLoginForm() {
         password="••••••"
         rememberMe={false}
         showError={true}
-        errorMessage="Incorrect email or password. Attempts left: 2"
+        errorMessage="Invalid email or password."
         onForgotPasswordClick={() => {
           const url = new URL(window.location.href)
           url.searchParams.set('screen', 'recover')
@@ -138,7 +138,8 @@ function ConnectedLoginForm() {
       password={password}
       rememberMe={rememberMe}
       isLoading={loading}
-      showError={error}
+      showError={!!error}
+      errorMessage={error}
       onEmailChange={setEmail}
       onPasswordChange={setPassword}
       onRememberMeChange={setRememberMe}

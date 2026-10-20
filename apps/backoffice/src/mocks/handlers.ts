@@ -11,7 +11,9 @@ export const handlers = [
       id: 'usr_admin_001',
       name: 'Giulia Bianchi',
       email: 'giulia@bloom.it',
-      role: 'ADMIN',
+      roles: ['ADMIN'],
+      isSuperAdmin: true,
+      language: 'it',
     })
   }),
 
@@ -21,17 +23,20 @@ export const handlers = [
     if (body.email && body.password) {
       return HttpResponse.json({
         accessToken: 'mock_jwt_token_shebloom_admin_2026',
+        expiresIn: 28800,
         user: {
           id: 'usr_admin_001',
           name: 'Giulia Bianchi',
           email: body.email,
-          role: 'ADMIN',
+          roles: ['ADMIN'],
+          isSuperAdmin: true,
+          language: 'it',
         },
       })
     }
     return HttpResponse.json(
-      { message: 'Invalid email or password.' },
-      { status: 400 }
+      { code: 'INVALID_CREDENTIALS', message: 'Invalid email or password.' },
+      { status: 401 }
     )
   }),
 

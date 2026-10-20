@@ -25,7 +25,7 @@ export function LoginForm({
   password = '',
   rememberMe = true,
   showError = false,
-  errorMessage = 'Incorrect email or password. Attempts left: 2',
+  errorMessage = 'Invalid email or password.', // no lockout in Phase 1 (RF-BO-ACC-02)
   isLoading = false,
   onEmailChange,
   onPasswordChange,

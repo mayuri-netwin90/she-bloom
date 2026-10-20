@@ -1,16 +1,56 @@
-import { createHmac, scrypt as scryptCallback, timingSafeEqual } from 'node:crypto';
-import { promisify } from 'node:util';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 import { database } from '../../database/database.js';
+import { verifyPassword } from '../../common/password.js';
 
-const scrypt = promisify(scryptCallback);
-const tokenLifetime = 60 * 60 * 8;
-type AdminUser = { id: string; email: string; name: string; password_hash: string; role: string; is_active: boolean };
-const secret = () => process.env.JWT_SECRET ?? 'replace-this-development-secret-before-production';
-const publicUser = (user: AdminUser) => ({ id: user.id, email: user.email, name: user.name, role: user.role });
+const tokenLifetime = 60 * 60 * 8; // seconds
+const rememberMeLifetime = 60 * 60 * 24 * 30; // "Remember me": absolute lifetime only, idle timeout (RF-BO-ACC-05) still applies
+if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) throw new Error('JWT_SECRET must be set in production.');
+const secret = process.env.JWT_SECRET ?? 'replace-this-development-secret-before-production';
 
-function sign(user: AdminUser) { const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url'); const body = Buffer.from(JSON.stringify({ sub: user.id, aud: 'admin', role: user.role, exp: Math.floor(Date.now() / 1000) + tokenLifetime })).toString('base64url'); return `${header}.${body}.${createHmac('sha256', secret()).update(`${header}.${body}`).digest('base64url')}`; }
-function verify(token: string) { const [header, body, signature] = token.split('.'); if (!header || !body || !signature) return null; const expected = createHmac('sha256', secret()).update(`${header}.${body}`).digest(); const supplied = Buffer.from(signature, 'base64url'); if (expected.length !== supplied.length || !timingSafeEqual(expected, supplied)) return null; try { const payload = JSON.parse(Buffer.from(body, 'base64url').toString('utf8')); return payload.aud === 'admin' && payload.exp > Date.now() / 1000 ? payload as { sub: string } : null; } catch { return null; } }
-async function verifyPassword(password: string, stored: string) { const [salt, hash] = stored.split(':'); if (!salt || !hash) return false; const derived = await scrypt(password, salt, 64) as Buffer; const known = Buffer.from(hash, 'hex'); return derived.length === known.length && timingSafeEqual(derived, known); }
+export type Role = 'ADMIN' | 'MODERATOR' | 'MENTOR';
+type AdminUser = { id: string; email: string; full_name: string; password_hash: string | null; is_admin: boolean; is_moderator: boolean; is_mentor: boolean; is_super_admin: boolean; status: 'invited' | 'active' | 'deactivated'; language: string };
+const columns = 'id, email, full_name, password_hash, is_admin, is_moderator, is_mentor, is_super_admin, status, language';
+const rolesOf = (u: AdminUser) => [u.is_admin && 'ADMIN', u.is_moderator && 'MODERATOR', u.is_mentor && 'MENTOR'].filter(Boolean) as Role[];
+const publicUser = (user: AdminUser) => ({ id: user.id, email: user.email, name: user.full_name, roles: rolesOf(user), isSuperAdmin: user.is_super_admin, language: user.language });
 
-export async function login(email: string, password: string) { const { rows } = await database.query<AdminUser>('SELECT id, email, name, password_hash, role, is_active FROM backoffice_users WHERE email = $1', [email.trim().toLowerCase()]); const user = rows[0]; if (!user || !user.is_active || !(await verifyPassword(password, user.password_hash))) return null; await database.query('UPDATE backoffice_users SET last_login_at = now(), updated_at = now() WHERE id = $1', [user.id]); return { accessToken: sign(user), expiresIn: tokenLifetime, user: publicUser(user) }; }
-export async function currentUser(token?: string) { const payload = token ? verify(token) : null; if (!payload?.sub) return null; const { rows } = await database.query<AdminUser>('SELECT id, email, name, password_hash, role, is_active FROM backoffice_users WHERE id = $1', [payload.sub]); return rows[0]?.is_active ? publicUser(rows[0]) : null; }
+function sign(user: AdminUser, sid: string, lifetime: number) { const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url'); const body = Buffer.from(JSON.stringify({ sub: user.id, sid, aud: 'admin', roles: rolesOf(user), exp: Math.floor(Date.now() / 1000) + lifetime })).toString('base64url'); return `${header}.${body}.${createHmac('sha256', secret).update(`${header}.${body}`).digest('base64url')}`; }
+function verify(token: string) { const [header, body, signature] = token.split('.'); if (!header || !body || !signature) return null; const expected = createHmac('sha256', secret).update(`${header}.${body}`).digest(); const supplied = Buffer.from(signature, 'base64url'); if (expected.length !== supplied.length || !timingSafeEqual(expected, supplied)) return null; try { const payload = JSON.parse(Buffer.from(body, 'base64url').toString('utf8')); return payload.aud === 'admin' && payload.exp > Date.now() / 1000 ? payload as { sub: string; sid?: string } : null; } catch { return null; } }
+
+export type LoginResult =
+  | { ok: true; accessToken: string; expiresIn: number; user: ReturnType<typeof publicUser> }
+  | { ok: false; reason: 'INVALID_CREDENTIALS' | 'ACCOUNT_DEACTIVATED' };
+
+export async function login(email: string, password: string, rememberMe = false): Promise<LoginResult> {
+  const { rows } = await database.query<AdminUser>(`SELECT ${columns} FROM bo_users WHERE lower(email) = $1`, [email]);
+  const user = rows[0];
+  // Always run scrypt (dummy hash when the user or password is missing) so timing doesn't reveal whether the email exists.
+  // Invited users have no password yet, so they also land on INVALID_CREDENTIALS.
+  const passwordOk = await verifyPassword(password, user?.password_hash ?? null);
+  if (!user || !passwordOk) return { ok: false, reason: 'INVALID_CREDENTIALS' };
+  // Checked only after a correct password, so deactivation doesn't leak account existence.
+  if (user.status === 'deactivated') return { ok: false, reason: 'ACCOUNT_DEACTIVATED' };
+  if (user.status !== 'active') return { ok: false, reason: 'INVALID_CREDENTIALS' };
+  await database.query('UPDATE bo_users SET last_login_at = now(), updated_at = now() WHERE id = $1', [user.id]);
+  const lifetime = rememberMe ? rememberMeLifetime : tokenLifetime;
+  const { rows: [session] } = await database.query<{ id: string }>(
+    `INSERT INTO bo_sessions (bo_user_id, expires_at) VALUES ($1, now() + make_interval(secs => $2)) RETURNING id`,
+    [user.id, lifetime],
+  );
+  return { ok: true, accessToken: sign(user, session.id, lifetime), expiresIn: lifetime, user: publicUser(user) };
+}
+
+/** Valid signature alone isn't enough: the session must exist, be unrevoked and unexpired, and the user still active. */
+export async function authenticate(token?: string) {
+  const payload = token ? verify(token) : null;
+  if (!payload?.sub || !payload.sid) return null;
+  const { rows } = await database.query<AdminUser>(
+    `SELECT ${columns.split(', ').map((c) => `u.${c}`).join(', ')} FROM bo_sessions s JOIN bo_users u ON u.id = s.bo_user_id
+     WHERE s.id = $1 AND s.bo_user_id = $2 AND s.revoked_at IS NULL AND s.expires_at > now()`,
+    [payload.sid, payload.sub],
+  );
+  return rows[0]?.status === 'active' ? { sessionId: payload.sid, user: publicUser(rows[0]) } : null;
+}
+
+export async function logout(sessionId: string) {
+  await database.query('UPDATE bo_sessions SET revoked_at = now() WHERE id = $1 AND revoked_at IS NULL', [sessionId]);
+}

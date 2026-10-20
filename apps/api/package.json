@@ -9,6 +9,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "dev": "tsx watch src/main.ts",
     "start": "tsx src/main.ts",
     "start:dev": "tsx watch src/main.ts",
     "start:prod": "node dist/main.js",
