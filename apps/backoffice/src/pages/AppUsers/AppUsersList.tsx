@@ -26,6 +26,7 @@ import { mockAppUsers, type AppUserItem } from './mockData'
 
 export interface AppUsersListProps {
   onExportCSV?: () => void
+  onSelectUser?: (user: AppUserItem) => void
 }
 
 type FilterTab = 'all' | 'club' | 'free' | 'blocked'
@@ -33,6 +34,7 @@ type SortDirection = 'asc' | 'desc'
 
 export function AppUsersList({
   onExportCSV = () => alert('Exporting App users CSV...'),
+  onSelectUser,
 }: AppUsersListProps) {
   const theme = useMantineTheme()
   const isTablet = useMediaQuery(
@@ -102,9 +104,11 @@ export function AppUsersList({
     setDrawerOpen(true)
   }
 
-  const handleActionClick = (e: React.MouseEvent, user: AppUserItem, action: 'edit' | 'block' | 'more') => {
+  const handleActionClick = (e: React.MouseEvent, user: AppUserItem, action: 'view' | 'edit' | 'block' | 'more') => {
     e.stopPropagation()
-    if (action === 'edit') {
+    if (action === 'view' && onSelectUser) {
+      onSelectUser(user)
+    } else if (action === 'edit' || action === 'view') {
       setSelectedUser(user)
       setDrawerOpen(true)
     } else if (action === 'block') {
@@ -555,7 +559,7 @@ export function AppUsersList({
                             color="gray"
                             size="sm"
                             aria-label="View user details"
-                            onClick={(e) => handleActionClick(e, user, 'edit')}
+                            onClick={(e) => handleActionClick(e, user, 'view')}
                             style={{ color: 'var(--text-secondary)' }}
                           >
                             <AppIcon name="view" size={16} stroke={1.5} />
@@ -745,6 +749,26 @@ export function AppUsersList({
               >
                 {selectedUser.status === 'blocked' ? 'Unblock user' : 'Block user'}
               </Button>
+              {onSelectUser && (
+                <Button
+                  variant="filled"
+                  color="brand-pink"
+                  size="sm"
+                  onClick={() => {
+                    setDrawerOpen(false)
+                    onSelectUser(selectedUser)
+                  }}
+                  styles={{
+                    root: {
+                      backgroundColor: 'var(--brand-primary)',
+                      color: 'var(--text-on-brand)',
+                      fontWeight: 600,
+                    },
+                  }}
+                >
+                  View full profile
+                </Button>
+              )}
             </Group>
           </Stack>
         )}

@@ -115,6 +115,26 @@ const statusStyleMap: Record<
     color: 'var(--status-neutral-fg)',
     dot: 'var(--status-neutral-fg)',
   },
+  upcoming: {
+    bg: 'var(--status-info-bg)',
+    color: 'var(--status-info-fg)',
+    dot: 'var(--status-info-fg)',
+  },
+  completed: {
+    bg: 'var(--status-success-bg)',
+    color: 'var(--status-success-fg)',
+    dot: 'var(--status-success-fg)',
+  },
+  cancelled: {
+    bg: 'var(--status-danger-bg)',
+    color: 'var(--status-danger-fg)',
+    dot: 'var(--status-danger-fg)',
+  },
+  canceled: {
+    bg: 'var(--status-danger-bg)',
+    color: 'var(--status-danger-fg)',
+    dot: 'var(--status-danger-fg)',
+  },
   to_verify: {
     bg: 'var(--status-warning-bg)',
     color: 'var(--status-warning-fg)',

@@ -4,6 +4,7 @@ import { Anchor, Box, Breadcrumbs, Group, Stack, Text, Title } from '@mantine/co
 export interface BreadcrumbItem {
   label: string
   href?: string
+  onClick?: (e: React.MouseEvent) => void
 }
 
 export interface PageHeaderProps {
@@ -38,6 +39,7 @@ export function PageHeader({
                 <Anchor
                   key={`${item.label}-${index}`}
                   href={item.href}
+                  onClick={item.onClick}
                   size="sm"
                   c="var(--text-secondary)"
                   underline="hover"

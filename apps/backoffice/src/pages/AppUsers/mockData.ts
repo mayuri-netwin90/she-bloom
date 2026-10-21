@@ -6,9 +6,106 @@ export interface AppUserItem {
   name: string
   email: string
   subscription: SubscriptionType
-  registeredOn: string // e.g. "12/05/2026"
+  registeredOn: string // e.g. "12/03/2026"
   sessions: number
   status: UserStatusType
+}
+
+export interface BookingActivityItem {
+  id: string
+  date: string // e.g. "14/10/2026 · 11:00"
+  service: string // e.g. "Session · Self-worth"
+  mentor: string // e.g. "Dr E. Mestri"
+  status: 'upcoming' | 'completed' | 'cancelled'
+}
+
+export interface PaymentItem {
+  id: string
+  date: string
+  description: string
+  amount: string
+  status: 'paid' | 'refunded' | 'failed'
+}
+
+export interface AccessLogItem {
+  id: string
+  timestamp: string
+  ip: string
+  device: string
+  event: string
+}
+
+export interface AppUserDetailData {
+  id: string
+  name: string
+  email: string
+  subscription: SubscriptionType
+  status: UserStatusType
+  registeredOn: string // "12/03/2026"
+  signInMethod: string // "Apple"
+  language: string // "Italiano"
+  city: string // "Milan"
+  dateOfBirth: string // "14/09/1991"
+  subscriptionPlan: string // "Annual · renews 12/03/2027"
+  store: string // "App Store"
+  lastLogin: string // "today at 08:42"
+  consents: {
+    privacyTnc: { version: string; date: string; granted: boolean }
+    healthData: { granted: boolean }
+    sosMode: { granted: boolean }
+  }
+  bookings: BookingActivityItem[]
+}
+
+export const mockSaraRossiDetail: AppUserDetailData = {
+  id: '1',
+  name: 'Sara Rossi',
+  email: 'sara.rossi@email.it',
+  subscription: 'club',
+  status: 'active',
+  registeredOn: '12/03/2026',
+  signInMethod: 'Apple',
+  language: 'Italiano',
+  city: 'Milan',
+  dateOfBirth: '14/09/1991',
+  subscriptionPlan: 'Annual · renews 12/03/2027',
+  store: 'App Store',
+  lastLogin: 'today at 08:42',
+  consents: {
+    privacyTnc: { version: 'v3', date: '12/03/2026', granted: true },
+    healthData: { granted: true },
+    sosMode: { granted: true },
+  },
+  bookings: [
+    {
+      id: 'b1',
+      date: '14/10/2026 · 11:00',
+      service: 'Session · Self-worth',
+      mentor: 'Dr E. Mestri',
+      status: 'upcoming',
+    },
+    {
+      id: 'b2',
+      date: '30/09/2026 · 18:00',
+      service: 'Program · Bloom again 3/4',
+      mentor: 'Chiara Bisceglie',
+      status: 'completed',
+    },
+    {
+      id: 'b3',
+      date: '16/09/2026 · 18:00',
+      service: 'Program · Bloom again 2/4',
+      mentor: 'Chiara Bisceglie',
+      status: 'completed',
+    },
+    {
+      id: 'b4',
+      date: '02/09/2026 · 10:00',
+      service: 'Session · Relations',
+      mentor: 'Francesca Leone',
+      status: 'cancelled',
+    },
+  ],
 }
 
 export const mockAppUsers: AppUserItem[] = [
@@ -17,7 +114,7 @@ export const mockAppUsers: AppUserItem[] = [
     name: 'Sara Rossi',
     email: 'sara.rossi@email.it',
     subscription: 'club',
-    registeredOn: '12/05/2026',
+    registeredOn: '12/03/2026',
     sessions: 4,
     status: 'active',
   },

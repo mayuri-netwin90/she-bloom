@@ -118,26 +118,50 @@ export function ActionModal({
               onClick={onConfirm}
               loading={isLoading}
               fullWidth
+              radius="md"
+              style={{
+                backgroundColor: isDestructive ? 'var(--status-danger-fg)' : 'var(--brand-primary)',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                height: 38,
+              }}
             >
               {confirmLabel}
             </Button>
             <Button
               variant="subtle"
-              color="gray"
               onClick={onClose}
               disabled={isLoading}
               fullWidth
+              style={{
+                color: 'var(--text-primary)',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                height: 38,
+              }}
             >
               {cancelLabel}
             </Button>
           </Stack>
         ) : (
-          <Group justify="flex-end" gap="sm" mt="sm">
+          <Group justify="flex-end" gap={20} mt="md" align="center">
             <Button
               variant="subtle"
-              color="gray"
               onClick={onClose}
               disabled={isLoading}
+              styles={{
+                root: {
+                  color: 'var(--text-primary)',
+                  fontWeight: 600,
+                  fontSize: '0.875rem',
+                  backgroundColor: 'transparent',
+                  height: 36,
+                  padding: '0 12px',
+                  '&:hover': {
+                    backgroundColor: 'var(--bg-subtle)',
+                  },
+                },
+              }}
             >
               {cancelLabel}
             </Button>
@@ -145,6 +169,16 @@ export function ActionModal({
               color={isDestructive ? 'red' : 'pink'}
               onClick={onConfirm}
               loading={isLoading}
+              radius="md"
+              styles={{
+                root: {
+                  backgroundColor: isDestructive ? 'var(--status-danger-fg)' : 'var(--brand-primary)',
+                  fontWeight: 600,
+                  fontSize: '0.875rem',
+                  height: 36,
+                  padding: '0 20px',
+                },
+              }}
             >
               {confirmLabel}
             </Button>

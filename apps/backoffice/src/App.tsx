@@ -11,7 +11,7 @@ import { EnableTwoFactorForm } from './pages/Auth/EnableTwoFactor'
 import { SetPasswordForm } from './pages/Auth/SetPassword'
 import { RecoverPassword } from './pages/Auth/RecoverPassword'
 import { AdminDashboard } from './pages/Dashboard'
-import { AppUsersList } from './pages/AppUsers'
+import { AppUsersList, AppUserDetail } from './pages/AppUsers'
 import './App.css'
 
 function ConnectedLoginForm() {
@@ -50,9 +50,32 @@ function ConnectedLoginForm() {
     }
   }
 
-  // Allow previewing different screens via URL query: ?screen=dashboard, ?screen=users, ?screen=2fa, etc.
+  // Allow previewing different screens via URL query: ?screen=dashboard, ?screen=users, ?screen=user-detail, etc.
   const params = new URLSearchParams(window.location.search)
   const screen = params.get('screen')
+
+  if (screen === 'user-detail' || screen === 'user_detail' || screen === 'app-user-detail') {
+    return (
+      <AppLayout
+        currentRole="admin"
+        activePath="/users/app"
+        user={{
+          name: 'Giulia Ferri',
+          email: 'giulia.ferri@shebloom.it',
+          role: 'admin',
+        }}
+        onLogout={() => { window.location.search = '' }}
+      >
+        <AppUserDetail
+          onBack={() => {
+            const url = new URL(window.location.href)
+            url.searchParams.set('screen', 'users')
+            window.location.href = url.toString()
+          }}
+        />
+      </AppLayout>
+    )
+  }
 
   if (screen === 'users' || screen === 'app-users' || screen === 'app_users') {
     return (
@@ -66,7 +89,13 @@ function ConnectedLoginForm() {
         }}
         onLogout={() => { window.location.search = '' }}
       >
-        <AppUsersList />
+        <AppUsersList
+          onSelectUser={() => {
+            const url = new URL(window.location.href)
+            url.searchParams.set('screen', 'user-detail')
+            window.location.href = url.toString()
+          }}
+        />
       </AppLayout>
     )
   }
@@ -184,12 +213,14 @@ function MainAppShell() {
           currentRole={user.role}
           onRoleChange={switchRole}
           onLogout={logout}
-          activePath={currentPath}
+          activePath={currentPath.startsWith('/users/app') ? '/users/app' : currentPath}
           onNavigate={(path) => setCurrentPath(path)}
           user={user}
         >
-          {currentPath === '/users/app' ? (
-            <AppUsersList />
+          {currentPath === '/users/app/detail' ? (
+            <AppUserDetail onBack={() => setCurrentPath('/users/app')} />
+          ) : currentPath === '/users/app' ? (
+            <AppUsersList onSelectUser={() => setCurrentPath('/users/app/detail')} />
           ) : (
             <AdminDashboard />
           )}
