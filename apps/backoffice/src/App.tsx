@@ -12,6 +12,8 @@ import { SetPasswordForm } from './pages/Auth/SetPassword'
 import { RecoverPassword } from './pages/Auth/RecoverPassword'
 import { AdminDashboard } from './pages/Dashboard'
 import { AppUsersList, AppUserDetail } from './pages/AppUsers'
+import { BackofficeUsers } from './pages/BackofficeUsers'
+import { MentorList, MentorDetail } from './pages/Mentors'
 import './App.css'
 
 function ConnectedLoginForm() {
@@ -93,6 +95,84 @@ function ConnectedLoginForm() {
           onSelectUser={() => {
             const url = new URL(window.location.href)
             url.searchParams.set('screen', 'user-detail')
+            window.location.href = url.toString()
+          }}
+        />
+      </AppLayout>
+    )
+  }
+
+  if (
+    screen === 'backoffice-users' ||
+    screen === 'bo-users' ||
+    screen === 'backoffice_users' ||
+    screen === 'settings/backoffice-users'
+  ) {
+    return (
+      <AppLayout
+        currentRole="admin"
+        activePath="/settings/backoffice-users"
+        user={{
+          name: 'Giulia Ferri',
+          email: 'giulia.ferri@shebloom.it',
+          role: 'admin',
+        }}
+        onLogout={() => {
+          window.location.search = ''
+        }}
+      >
+        <BackofficeUsers />
+      </AppLayout>
+    )
+  }
+
+  if (screen === 'mentors' || screen === 'mentor' || screen === 'mentor-list') {
+    return (
+      <AppLayout
+        currentRole="admin"
+        activePath="/mentors"
+        user={{
+          name: 'Giulia Ferri',
+          email: 'giulia.ferri@shebloom.it',
+          role: 'admin',
+        }}
+        onLogout={() => {
+          window.location.search = ''
+        }}
+      >
+        <MentorList
+          onSelectMentor={(mentor) => {
+            const url = new URL(window.location.href)
+            url.searchParams.set('screen', 'mentor-detail')
+            url.searchParams.set('id', mentor.id)
+            window.location.href = url.toString()
+          }}
+        />
+      </AppLayout>
+    )
+  }
+
+  if (screen === 'mentor-detail' || screen === 'mentors/detail' || screen === 'mentor_detail') {
+    const mentorId = params.get('id') || 'men-1'
+    return (
+      <AppLayout
+        currentRole="admin"
+        activePath="/mentors"
+        user={{
+          name: 'Giulia Ferri',
+          email: 'giulia.ferri@shebloom.it',
+          role: 'admin',
+        }}
+        onLogout={() => {
+          window.location.search = ''
+        }}
+      >
+        <MentorDetail
+          mentorId={mentorId}
+          onBack={() => {
+            const url = new URL(window.location.href)
+            url.searchParams.set('screen', 'mentors')
+            url.searchParams.delete('id')
             window.location.href = url.toString()
           }}
         />
@@ -205,6 +285,7 @@ function ConnectedLoginForm() {
 function MainAppShell() {
   const { user, logout, switchRole } = useAuth()
   const [currentPath, setCurrentPath] = useState('/dashboard')
+  const [selectedMentorId, setSelectedMentorId] = useState<string>('men-1')
 
   return (
     <ProtectedRoute fallback={<ConnectedLoginForm />}>
@@ -213,7 +294,13 @@ function MainAppShell() {
           currentRole={user.role}
           onRoleChange={switchRole}
           onLogout={logout}
-          activePath={currentPath.startsWith('/users/app') ? '/users/app' : currentPath}
+          activePath={
+            currentPath.startsWith('/users/app')
+              ? '/users/app'
+              : currentPath.startsWith('/mentors')
+                ? '/mentors'
+                : currentPath
+          }
           onNavigate={(path) => setCurrentPath(path)}
           user={user}
         >
@@ -221,6 +308,20 @@ function MainAppShell() {
             <AppUserDetail onBack={() => setCurrentPath('/users/app')} />
           ) : currentPath === '/users/app' ? (
             <AppUsersList onSelectUser={() => setCurrentPath('/users/app/detail')} />
+          ) : currentPath === '/settings/backoffice-users' ? (
+            <BackofficeUsers />
+          ) : currentPath === '/mentors/detail' ? (
+            <MentorDetail
+              mentorId={selectedMentorId}
+              onBack={() => setCurrentPath('/mentors')}
+            />
+          ) : currentPath === '/mentors' ? (
+            <MentorList
+              onSelectMentor={(mentor) => {
+                setSelectedMentorId(mentor.id)
+                setCurrentPath('/mentors/detail')
+              }}
+            />
           ) : (
             <AdminDashboard />
           )}

@@ -802,6 +802,7 @@ export const theme = createTheme({
     Switch: {
       defaultProps: {
         color: 'pink',
+        withThumbIndicator: false,
       },
       styles: {
         label: {

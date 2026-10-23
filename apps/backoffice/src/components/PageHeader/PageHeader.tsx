@@ -69,8 +69,17 @@ export function PageHeader({
         </Breadcrumbs>
       )}
 
-      <Group justify="space-between" align="flex-start" wrap="wrap" gap="md">
-        <div>
+      <Group
+        justify="space-between"
+        align="flex-start"
+        gap="md"
+        wrap="nowrap"
+        style={{
+          flexWrap: 'wrap',
+        }}
+        className="page-header-group"
+      >
+        <Box style={{ flex: 1, minWidth: 0 }}>
           <Title
             order={1}
             size="h2"
@@ -95,10 +104,11 @@ export function PageHeader({
               {subtitle}
             </Text>
           )}
-        </div>
+        </Box>
         {action && (
           <Box
             w={{ base: '100%', sm: 'auto' }}
+            style={{ flexShrink: 0 }}
             className="page-header-action-container"
           >
             {action}

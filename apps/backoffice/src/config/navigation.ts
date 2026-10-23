@@ -38,7 +38,7 @@ export const navigationItems: NavigationItem[] = [
   },
   {
     key: 'admin-mentors',
-    label: 'Mentors',
+    label: 'Mentor',
     path: '/mentors',
     iconName: 'userCheck',
     roles: ['admin'],

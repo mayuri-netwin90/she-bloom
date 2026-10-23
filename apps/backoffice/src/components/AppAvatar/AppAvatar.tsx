@@ -24,7 +24,7 @@ export const AppAvatar: React.FC<AppAvatarProps> = ({
   src,
   size = 'md',
   alt = 'Avatar',
-  bgColor = 'var(--brand-accent)',
+  bgColor = 'var(--brand-secondary)',
   textColor = 'var(--bg-sidebar)',
 }) => {
   const pixelSize = typeof size === 'number' ? size : avatarSizes[size]

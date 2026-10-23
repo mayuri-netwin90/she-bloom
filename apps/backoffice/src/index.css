@@ -1,3 +1,81 @@
+/* ==========================================================================
+   Font Declarations (Local fonts from public/fonts/)
+   1. Erstoria (Headings / Serif)
+   2. Outfit (Body, UI, Labels, Numbers)
+   3. DM Sans (Footnote / Secondary body, loaded via Google Fonts link in index.html)
+   ========================================================================== */
+
+/* 1. Erstoria */
+@font-face {
+  font-family: 'Erstoria';
+  src: url('/fonts/Erstoria Font/Erstoria.woff2') format('woff2'),
+       url('/fonts/Erstoria Font/Erstoria.otf') format('opentype'),
+       url('/fonts/Erstoria Font/Erstoria.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Erstoria';
+  src: url('/fonts/Erstoria Font/Erstoria.woff2') format('woff2'),
+       url('/fonts/Erstoria Font/Erstoria.otf') format('opentype'),
+       url('/fonts/Erstoria Font/Erstoria.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 2. Outfit (Variable font & static fallbacks) */
+@font-face {
+  font-family: 'Outfit';
+  src: url('/fonts/Outfit Font/Outfit-VariableFont_wght.ttf') format('truetype-variations'),
+       url('/fonts/Outfit Font/static/Outfit-Regular.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('/fonts/Outfit Font/static/Outfit-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('/fonts/Outfit Font/static/Outfit-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('/fonts/Outfit Font/static/Outfit-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('/fonts/Outfit Font/static/Outfit-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('/fonts/Outfit Font/static/Outfit-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -182,14 +260,29 @@ button .tabler-icon,
   border-color: var(--border-strong) !important;
 }
 
-/* Mobile full width export button */
+/* Mobile full width export/action button */
 @media (max-width: 767.98px) {
   .page-header-action-container,
   .page-header-action-container > button,
   .page-header-action-container .mantine-Button-root {
     width: 100% !important;
     display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .page-header-action-container .mantine-Button-inner {
+    width: 100% !important;
+    justify-content: center !important;
   }
 }
+
+/* Tablet & Desktop: keep PageHeader actions aligned to the right */
+@media (min-width: 768px) {
+  .page-header-group {
+    flex-wrap: nowrap !important;
+  }
+}
+
 
 
